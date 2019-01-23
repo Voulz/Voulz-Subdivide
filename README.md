@@ -64,43 +64,43 @@ The second set of functions are working on an existing mesh. It is advised to wr
 def triangulate!(entities)
 
 # Triangulate and then subdivide entities the given number of times, independantly of their size
-  # WRAP IN AN OPERATION !
-  # This version will directly triangulate the given entities
-  # @param [ Sketchup::Entities | Array<Sketchup::Entity> ] entities Entities to be triangulated and subdivided
-  # @param [ Fiznum ] nbtimes The number of times the entities will need to be subdivided
-  def subdivide_face!(entities, nbtimes)
+# WRAP IN AN OPERATION !
+# This version will directly triangulate the given entities
+# @param [ Sketchup::Entities | Array<Sketchup::Entity> ] entities Entities to be triangulated and subdivided
+# @param [ Fiznum ] nbtimes The number of times the entities will need to be subdivided
+def subdivide_face!(entities, nbtimes)
 
-  # Triangulate and then subdivide entities until each edge of each triangle has a maximum length of max_length.
-  # @param [ Sketchup::Entities | Array<Sketchup::Entity> ] entities Entities to be triangulated and subdivided
-  # @param [ Float ] max_length Maximum length the edges can have. If they have less, the triangle will be subdivided
-  def subdivide_length_face!(entities, max_length)
+# Triangulate and then subdivide entities until each edge of each triangle has a maximum length of max_length.
+# @param [ Sketchup::Entities | Array<Sketchup::Entity> ] entities Entities to be triangulated and subdivided
+# @param [ Float ] max_length Maximum length the edges can have. If they have less, the triangle will be subdivided
+def subdivide_length_face!(entities, max_length)
 
 
-  # Subdivide the face a given number of times, independantly of their size
-  # @param [ Sketchup::Point3d ] p1
-  # @param [ Sketchup::Point3d ] p2
-  # @param [ Sketchup::Point3d ] p3
-  # @param [ Sketchup::Point3d ] uv1 Front UV of p1
-  # @param [ Sketchup::Point3d ] uv2 Front UV of p2
-  # @param [ Sketchup::Point3d ] uv3 Front UV of p3
-  # @param [ Sketchup::Point3d ] uv1 Back UV of p1
-  # @param [ Sketchup::Point3d ] uv2 Back UV of p2
-  # @param [ Sketchup::Point3d ] uv3 Back UV of p3
-  # @param [ Fiznum ] nbtimes The number of times the entities will need to be subdivided
-  def subdivide_mesh_face(mesh, p1, p2, p3, uv1, uv2, uv3, _uv1, _uv2, _uv3, nbtimes)
+# Subdivide the face a given number of times, independantly of their size
+# @param [ Sketchup::Point3d ] p1
+# @param [ Sketchup::Point3d ] p2
+# @param [ Sketchup::Point3d ] p3
+# @param [ Sketchup::Point3d ] uv1 Front UV of p1
+# @param [ Sketchup::Point3d ] uv2 Front UV of p2
+# @param [ Sketchup::Point3d ] uv3 Front UV of p3
+# @param [ Sketchup::Point3d ] uv1 Back UV of p1
+# @param [ Sketchup::Point3d ] uv2 Back UV of p2
+# @param [ Sketchup::Point3d ] uv3 Back UV of p3
+# @param [ Fiznum ] nbtimes The number of times the entities will need to be subdivided
+def subdivide_mesh_face(mesh, p1, p2, p3, uv1, uv2, uv3, _uv1, _uv2, _uv3, nbtimes)
 
-  # Subdivide a triangle until each edge has a maximum length of max_length.
-  # @param [ Sketchup::Point3d ] p1
-  # @param [ Sketchup::Point3d ] p2
-  # @param [ Sketchup::Point3d ] p3
-  # @param [ Sketchup::Point3d ] uv1 Front UV of p1
-  # @param [ Sketchup::Point3d ] uv2 Front UV of p2
-  # @param [ Sketchup::Point3d ] uv3 Front UV of p3
-  # @param [ Sketchup::Point3d ] uv1 Back UV of p1
-  # @param [ Sketchup::Point3d ] uv2 Back UV of p2
-  # @param [ Sketchup::Point3d ] uv3 Back UV of p3
-  # @param [ Float ] max_length Maximum length the edges can have. If they have less, the triangle will be subdivided
-  def subdivide_length_mesh_face(mesh, p1, p2, p3, uv1, uv2, uv3, _uv1, _uv2, _uv3, max_length)
+# Subdivide a triangle until each edge has a maximum length of max_length.
+# @param [ Sketchup::Point3d ] p1
+# @param [ Sketchup::Point3d ] p2
+# @param [ Sketchup::Point3d ] p3
+# @param [ Sketchup::Point3d ] uv1 Front UV of p1
+# @param [ Sketchup::Point3d ] uv2 Front UV of p2
+# @param [ Sketchup::Point3d ] uv3 Front UV of p3
+# @param [ Sketchup::Point3d ] uv1 Back UV of p1
+# @param [ Sketchup::Point3d ] uv2 Back UV of p2
+# @param [ Sketchup::Point3d ] uv3 Back UV of p3
+# @param [ Float ] max_length Maximum length the edges can have. If they have less, the triangle will be subdivided
+def subdivide_length_mesh_face(mesh, p1, p2, p3, uv1, uv2, uv3, _uv1, _uv2, _uv3, max_length)
 ```
 # Known Bugs and Limitations
 
