@@ -40,6 +40,10 @@ module Voulz
         -1 : sub >= EPSILON ? 1 : 0
     end
 
+    def mid_point(p1, p2)
+      Geom::Point3d.new((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2)
+    end
+
     # ---------- OTHER UTILS ----------
 
     def dump_var(v, _puts = true, monoline = false, _indent = 2)

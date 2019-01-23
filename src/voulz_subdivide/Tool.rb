@@ -11,9 +11,11 @@ module Voulz::Plugins::VoulzSubdivide
     @entities = []
     @result = []
     @stats = nil
+    @model = nil
 
     def activate
-      @entities = Sketchup.active_model.selection.to_a
+      @model = Sketchup.active_model
+      @entities = @model.selection.to_a
 
       unless @entities.length == 0
         @stats = get_stats(@entities)
@@ -22,7 +24,7 @@ module Voulz::Plugins::VoulzSubdivide
         process_last_input
       end
       set_status_text
-      Sketchup.active_model.active_view.invalidate
+      @model.active_view.invalidate
     end
 
     def deactivate(view)
@@ -92,6 +94,45 @@ module Voulz::Plugins::VoulzSubdivide
       end
     end
 
+    def onReturn(view)
+      if @entities.nil? || @entities.length == 0 || (input = @@last[:input].to_f).nil?
+        @model.select_tool(nil)
+        return
+      end
+      input = input.to_i if input <= 0
+
+      begin
+        @model.start_operation("Voulz - Subdivide #{@@last[:input]}", true)
+
+        if input > 0
+          # triangulate + subdivide based on max length
+          Voulz::Plugins::VoulzSubdivide.subdivide_length_face!(@entities, input)
+        elsif input < 0
+          # triangulate + subdivide based on the number of times we want it subdivided
+          Voulz::Plugins::VoulzSubdivide.subdivide_face!(@entities, input.abs)
+        else
+          # do not subdivide but still triangulate
+          Voulz::Plugins::VoulzSubdivide.triangulate!(@entities)
+        end
+
+        @model.commit_operation
+        @model.select_tool(nil)
+      rescue => e
+        @model.abort_operation
+        raise e, e.message, e.backtrace
+      end
+    end
+
+    def onKeyDown(key, repeat, flags, view)
+      puts "onKeyDown: key = #{key}\n" +
+             "        repeat = #{repeat}\n" +
+             "         flags = #{flags}\n" +
+             "          view = #{view}\n" if DEBUG
+      if key == 27 #Escape
+        @model.select_tool(nil)
+      end
+    end
+
     # --------------------------------------------------------
     #                       MENU ITEMS
     # --------------------------------------------------------
@@ -110,14 +151,14 @@ module Voulz::Plugins::VoulzSubdivide
       if input > 0
         # triangulate + subdivide based on max length
         avg = (@stats[:average] / input).to_i # average number of division of edge, really simple computation not close to reality
-        nb_faces = avg * @stats[:nb]
-        return nb_faces < 1000
+        nb_faces = avg * 4 * @stats[:nb]
+        return nb_faces < 3001
       elsif input < 0
-        nb_faces = @stats[:nb] ** 4 #4 triangles per triangle
+        nb_faces = @stats[:nb] #4 triangles per triangle
         for i in 1..input.abs
-          nb_faces += nb_faces ** 4
+          nb_faces *= 4
         end
-        return nb_faces < 1000 #should be fine if only 3 or less subdivisions
+        return nb_faces < 3001 #should be fine if only 3 or less subdivisions
         #   return input > -4 #should be fine if only 3 or less subdivisions
       else
         return true
@@ -175,13 +216,14 @@ module Voulz::Plugins::VoulzSubdivide
             stats[:maxlength] = length if length > stats[:maxlength]
           end
         elsif ent.respond_to?(:transformation) && ent.respond_to?(:definition)
+          next if ent.locked?
           _stats = get_stats(ent.definition.entities, tr * ent.transformation)
           stats[:nb] += _stats[:nb]
           stats[:sum] += _stats[:sum]
           stats[:maxlength] = _stats[:maxlength] if _stats[:maxlength] > stats[:maxlength]
         end
       }
-      stats[:average] = stats[:sum] / stats[:nb]
+      stats[:average] = stats[:nb] == 0 ? 0 : stats[:sum] / stats[:nb]
       stats
     end
   end # class Tool
