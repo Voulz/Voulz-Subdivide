@@ -1,4 +1,3 @@
-![alt text](imgs/Logo.png)
 # Voulz-Subdivide
 Sketchup Plugin to triangulate and subdivide faces. Can be used to subdivide until reaching a maximum edge length or to subdivide a certain number of times.
 
