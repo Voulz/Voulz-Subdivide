@@ -15,28 +15,25 @@ require_relative "Tool"
 # - check if the geometry is clean ✔
 # - add the new elements to the selection
 # - ask if the new triangles should be hidden, and check how to do that
+# - check what to do when the faces are inside groups/components that are scaled
 module Voulz::Plugins::VoulzSubdivide
-  DEBUG ||= false
-
   # --------------------------------------------------------
   #                       MENU ITEMS
   # --------------------------------------------------------
   unless file_loaded?(__FILE__)
-    plugins_menu = UI.menu("Plugins")
-    voulzmenu = plugins_menu.add_submenu("Voulz")
+    menu = Voulz::Plugins.GetMenu
 
-    voulzmenu.add_item("Subdivide") {
+    cmd = UI::Command.new("Subdivide Faces") {
       puts "\n -- #{self.class} reloaded #{reload} files\n\n" if DEBUG
       Sketchup.active_model.select_tool(Tool.new)
     }
+    cmd.status_bar_text = "Subdivide the selected faces."
+    cmd.tooltip = cmd.status_bar_text
+    # TODO: Check if better to grey out or to indicate when the tool start
+    #cmd.set_validation_proc { Sketchup.active_model.selection.length == 0 ? MF_GRAYED :  MF_ENABLED }
+    menu.add_item(cmd)
 
-    #   menu.add_separator
-
-    #   item = menu.add_item("Settings...") { }
-    #   plugins_menu.set_validation_proc(item) {
-    # 	 MF_GRAYED
-    #   }
-    item = voulzmenu.add_item("Subdivide Reload") {
+    item = menu.add_item("Subdivide Reload") {
       puts "\n -- #{self.class} reloaded #{reload} files\n\n"
     } if DEBUG
   end
@@ -238,9 +235,9 @@ module Voulz::Plugins::VoulzSubdivide
   # This version will directly triangulate the given entities
   # @param [ Sketchup::Entities | Array<Sketchup::Entity> ] entities Entities to be triangulated and subdivided
   def triangulate!(entities)
-    triangulate_base!(entities) { |face|
-      face.mesh(7) #get the points + UV Front + UV Back + Normals
-    }
+    triangulate_base!(entities) #{ |face|
+    #    face.mesh(7) #get the points + UV Front + UV Back + Normals
+    #  }
   end
 
   # Triangulate and then subdivide entities the given number of times, independantly of their size
@@ -249,8 +246,8 @@ module Voulz::Plugins::VoulzSubdivide
   # @param [ Sketchup::Entities | Array<Sketchup::Entity> ] entities Entities to be triangulated and subdivided
   # @param [ Fiznum ] nbtimes The number of times the entities will need to be subdivided
   def subdivide_face!(entities, nbtimes)
-    triangulate_base!(entities) { |face|
-      mesh = face.mesh(7) #get the points + UV Front + UV Back + Normals
+    triangulate_base!(entities) { |mesh| # |face| #Replace the face by the mesh of the face
+      # mesh = face.mesh(7) #get the points + UV Front + UV Back + Normals
       new_mesh = Geom::PolygonMesh.new
       mesh.points.each_with_index { |pt, _i|
         i = new_mesh.add_point(pt)
@@ -284,8 +281,8 @@ module Voulz::Plugins::VoulzSubdivide
   # @param [ Sketchup::Entities | Array<Sketchup::Entity> ] entities Entities to be triangulated and subdivided
   # @param [ Float ] max_length Maximum length the edges can have. If they have less, the triangle will be subdivided
   def subdivide_length_face!(entities, max_length)
-    triangulate_base!(entities) { |face|
-      mesh = face.mesh(7) #get the points + UV Front + UV Back + Normals
+    triangulate_base!(entities) { |mesh| # |face| #Replace the face by the mesh of the face
+      # mesh = face.mesh(7) #get the points + UV Front + UV Back + Normals
       new_mesh = Geom::PolygonMesh.new
       mesh.points.each_with_index { |pt, _i|
         i = new_mesh.add_point(pt)
@@ -328,12 +325,11 @@ module Voulz::Plugins::VoulzSubdivide
     entities.each { |ent|
       next if !ent.valid? || ent.hidden? || !ent.layer.visible?
       if ent.is_a?(Sketchup::Face)
-        faces << ent
+        faces << [ent, ent.mesh(7)] # get the mesh here because it would change afterwards when the surrounding faes would be processed first
       elsif ent.is_a?(Sketchup::Group) || ent.is_a?(Sketchup::ComponentInstance)
         next if ent.locked? || added_groups.include?(ent)
         _def = ent.definition
         if components.include?(_def)
-          puts "`#{_def.name}` included"
           if ent.respond_to?(:definition=) #comp
             ent.definition = components[_def]
           else # groups dont have :definition=
@@ -347,7 +343,6 @@ module Voulz::Plugins::VoulzSubdivide
             Sketchup.active_model.selection.add(g)
           end
         else
-          puts "`#{_def.name}` not included"
           ent.make_unique
           components[_def] = ent.definition
           triangulate_base!(ent.definition.entities, components, &block)
@@ -355,14 +350,15 @@ module Voulz::Plugins::VoulzSubdivide
       end
     }
 
-    faces.each { |face|
+    faces.each { |face, _mesh|
       next unless face.valid?
       parent = face.parent
 
       front_mat = face.material
       back_mat = face.back_material
 
-      mesh = block.call(face) # face.mesh(7) #get the points + UV Front + UV Back + Normals
+      # we do not get the mesh of the face here because one of the surrounding face might have been processed first and this would change the mesh
+      mesh = block ? block.call(_mesh) : _mesh
 
       face.erase!
       parent.entities.add_faces_from_mesh(mesh, Geom::PolygonMesh::NO_SMOOTH_OR_HIDE, front_mat, back_mat)

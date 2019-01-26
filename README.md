@@ -1,3 +1,4 @@
+![alt text](imgs/Logo.png)
 # Voulz-Subdivide
 Sketchup Plugin to triangulate and subdivide faces. Can be used to subdivide until reaching a maximum edge length or to subdivide a certain number of times.
 
@@ -5,11 +6,16 @@ Sketchup Plugin to triangulate and subdivide faces. Can be used to subdivide unt
 Select Faces and Groups/Components and run the plugin through `Extensions > Vouz > Subdivide`
 
 You are then prompt to enter a number.
-- Enter a positive number to subdivide the selected faces based on a maximum edge length (ex: 12.5)
+- Enter a positive number to subdivide the selected faces based on a maximum edge length (ex: 500)
 - Enter a negative number to subdivide the selected faces a fixed number of times (ex: -2 will subdivide all the faces 2 times)
-- Enter 0 to just Triangulate the selected faces
+- Enter 0 to just triangulate the selected faces
 
 Press Enter once to update the preview and press Enter again to actually process the algorithm.
+
+![alt text](imgs/Menu.jpg)
+![alt text](imgs/Triangulate.jpg)
+![alt text](imgs/Subdivide.jpg)
+![alt text](imgs/Subdivide-Length.jpg)
 
 # API
 When the Plugin is loaded, you can access its public functions in the namespace `Voulz::Plugins::VoulzSubdivide`
@@ -120,3 +126,4 @@ Bugs:
 Limitations:
 - Not all the new elements are added to the selection
 - For now, all the new triangle edges are visible but it should be prompted to the user if they should be hidden, smoothed and soften.
+- If the group/component is scaled, the subdivision by length is applied on the unscaled size of the entities. This allows the algorithm to only process groups/components once and keep the instances linked together.

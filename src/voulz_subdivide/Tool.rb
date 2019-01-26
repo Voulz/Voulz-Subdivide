@@ -102,7 +102,7 @@ module Voulz::Plugins::VoulzSubdivide
       input = input.to_i if input <= 0
 
       begin
-        @model.start_operation("Voulz - Subdivide #{@@last[:input]}", true)
+        @model.start_operation("Voulz - Subdivide #{@@last[:inputTxt]}", true)
 
         if input > 0
           # triangulate + subdivide based on max length
@@ -124,10 +124,10 @@ module Voulz::Plugins::VoulzSubdivide
     end
 
     def onKeyDown(key, repeat, flags, view)
-      puts "onKeyDown: key = #{key}\n" +
-             "        repeat = #{repeat}\n" +
-             "         flags = #{flags}\n" +
-             "          view = #{view}\n" if DEBUG
+      # puts "onKeyDown: key = #{key}\n" +
+      #        "        repeat = #{repeat}\n" +
+      #        "         flags = #{flags}\n" +
+      #        "          view = #{view}\n" if DEBUG
       if key == 27 #Escape
         @model.select_tool(nil)
       end
@@ -170,7 +170,7 @@ module Voulz::Plugins::VoulzSubdivide
       if @result.nil? || @result.length == 0
         Sketchup.status_text = "Please select faces and groups to subdvide prior to use the tool."
       else
-        Sketchup.status_text = "Enter a positive number for a maximum edge length (ex: 12.5) or a negative number for a number of subdivision iteration (ex: -2)"
+        Sketchup.status_text = "Enter 0 for triangulation, a positive number for a maximum edge length (ex: 12.5) or a negative number for a number of subdivision iteration (ex: -2)"
       end
       Sketchup.vcb_label = "Subdivisions:"
       Sketchup.vcb_value = @@last[:inputTxt]

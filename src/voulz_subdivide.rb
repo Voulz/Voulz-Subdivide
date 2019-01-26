@@ -4,7 +4,13 @@ require "extensions.rb"
 
 module Voulz
   module Plugins
+    # Get the Menu item in the Plugin Extension, or create it if necessary
+    module_function def GetMenu
+      @menu ||= UI.menu("Plugins").add_submenu("Voulz")
+    end
+
     module VoulzSubdivide
+      DEBUG ||= false
       PLUGIN_NAME ||= "Voulz Subdivide".freeze
       PLUGIN_VERSION ||= "0.1.0a".freeze
 
@@ -24,8 +30,14 @@ module Voulz
         Sketchup.register_extension(@ex, true)
       end
 
+		  # --------------------------------------------------------
+  #                   MODULE FUNCTIONS
+  # --------------------------------------------------------
+
       module_function
 
+		# Reload ann the files within the folder. Call with : 
+		# Voulz::Plugins::VoulzSubdivide.reload
       def reload
         original_verbose = $VERBOSE
         $VERBOSE = nil
