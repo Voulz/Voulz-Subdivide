@@ -4,11 +4,6 @@ require "extensions.rb"
 
 module Voulz
   module Plugins
-    # Get the Menu item in the Plugin Extension, or create it if necessary
-    module_function def GetMenu
-      @menu ||= UI.menu("Plugins").add_submenu("Voulz")
-    end
-
     module VoulzSubdivide
       DEBUG ||= false
       PLUGIN_NAME ||= "Voulz Subdivide".freeze

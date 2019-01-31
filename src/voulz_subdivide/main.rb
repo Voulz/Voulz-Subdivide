@@ -1,6 +1,13 @@
 require_relative "utils/Utils"
 require_relative "Tool"
 
+module Voulz::Plugins
+  # Get the Menu item in the Plugin Extension, or create it if necessary
+  module_function def GetMenu
+    @menu ||= UI.menu("Plugins").add_submenu("Voulz")
+  end
+end
+
 # TODO: Have to test with:
 # - faces with textures ✔
 # - Problem with textures distorted in perspective
