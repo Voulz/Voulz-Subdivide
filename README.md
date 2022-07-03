@@ -1,6 +1,9 @@
 # Voulz-Subdivide
 Sketchup Plugin to triangulate and subdivide faces. Can be used to subdivide until reaching a maximum edge length or to subdivide a certain number of times.
 
+Available on the Extension Warehouse:
+https://extensions.sketchup.com/extension/26033c3f-31ba-482f-84d7-d934195c43b4/voulz-subdivide
+
 # Usage
 Select Faces and Groups/Components and run the plugin through `Extensions > Vouz > Subdivide`
 
